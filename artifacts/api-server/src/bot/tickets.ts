@@ -8,6 +8,7 @@ import {
   Guild,
   GuildMember,
   Interaction,
+  MessageFlags,
   PermissionFlagsBits,
   TextChannel,
   time,
@@ -85,12 +86,12 @@ export async function openTicket(
   if (!guild || !member) {
     await interaction.reply({
       content: "❌ Bu işlem sadece sunucularda yapılabilir.",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
 
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   const safeName = member.user.username.toLowerCase().replace(/[^a-z0-9]/g, "-");
   const existingTicket = guild.channels.cache.find(
@@ -230,7 +231,7 @@ export async function claimTicket(interaction: Interaction): Promise<void> {
   if (!hasSupport) {
     await interaction.reply({
       content: "❌ Bu ticketi devralmak için yetkili rolüne sahip olmalısın!",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
@@ -301,7 +302,6 @@ export async function closeTicketPrompt(
           .setStyle(ButtonStyle.Primary),
       ),
     ],
-    ephemeral: false,
   });
 }
 
@@ -352,6 +352,6 @@ export async function resetSelect(interaction: Interaction): Promise<void> {
   if (!interaction.isButton()) return;
   await interaction.reply({
     content: "🔧 Seçim sıfırlandı. Tekrar bir kategori seçebilirsiniz.",
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   });
 }
