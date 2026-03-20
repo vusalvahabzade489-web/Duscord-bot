@@ -40,11 +40,12 @@ export async function startBot(): Promise<void> {
     logger.info({ tag: c.user.tag }, "Discord bot is ready");
 
     c.user.setPresence({
-      status: "idle",
+      status: "online",
       activities: [
         {
-          name: "🛡️ Sunucuyu koruyor",
-          type: ActivityType.Watching,
+          name: "🛡️ Tr Aze RP Ticket Sistemi",
+          type: ActivityType.Streaming,
+          url: "https://www.twitch.tv/discord",
         },
       ],
     });

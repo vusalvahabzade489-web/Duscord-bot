@@ -97,7 +97,7 @@ export async function openTicket(
   const existingTicket = guild.channels.cache.find(
     (c) =>
       c.type === ChannelType.GuildText &&
-      c.name === `ticket-${safeName}`,
+      c.name === `🎫・ticket-${safeName}`,
   ) as TextChannel | undefined;
 
   if (existingTicket) {
@@ -110,7 +110,7 @@ export async function openTicket(
   const category = await getOrCreateCategory(guild);
 
   const ticketChannel = await guild.channels.create({
-    name: `ticket-${safeName}`,
+    name: `🎫・ticket-${safeName}`,
     type: ChannelType.GuildText,
     parent: category.id,
     permissionOverwrites: [
