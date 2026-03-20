@@ -6,9 +6,10 @@ import {
   EmbedBuilder,
   PermissionFlagsBits,
   SlashCommandBuilder,
+  StringSelectMenuBuilder,
   TextChannel,
 } from "discord.js";
-import { BUTTON_IDS, COLORS } from "./config.js";
+import { BUTTON_IDS, CATEGORIES, COLORS, SELECT_IDS, SERVER_NAME } from "./config.js";
 import { logger } from "../lib/logger.js";
 
 export const commands = [
@@ -41,32 +42,44 @@ export async function handleSetup(
 
   const panelEmbed = new EmbedBuilder()
     .setColor(COLORS.BLURPLE)
-    .setTitle("🎫 Destek Merkezi")
+    .setTitle(`${SERVER_NAME.toUpperCase()} DESTEK MERKEZİ 🎫`)
     .setDescription(
-      "Herhangi bir konuda yardıma mı ihtiyacın var?\n\n" +
-        "Aşağıdaki **Ticket Aç** butonuna tıklayarak sana özel bir destek kanalı oluşturabilirsin.\n\n" +
-        "**📌 Lütfen dikkat:**\n" +
-        "• Gereksiz ticket açmayın\n" +
-        "• Sorununuzu net ve anlaşılır şekilde belirtin\n" +
-        "• Destek ekibi en kısa sürede yanıt verecektir",
+      "**Bir sorun mu yaşıyorsunuz?**\n\n" +
+        "Aşağıdaki menüden size en uygun kategoriyi seçerek bizimle iletişime geçebilirsiniz.\n\n" +
+        CATEGORIES.map((c) => `${c.emoji} **${c.label}:** ${c.description}`).join("\n"),
     )
     .setThumbnail(interaction.guild?.iconURL() ?? null)
     .setFooter({
-      text: `${interaction.guild?.name ?? "Sunucu"} Destek Sistemi`,
+      text: `${SERVER_NAME} | Profesyonel Destek Hattı`,
       iconURL: interaction.guild?.iconURL() ?? undefined,
     })
     .setTimestamp();
 
-  const openRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+  const selectMenu = new StringSelectMenuBuilder()
+    .setCustomId(SELECT_IDS.TICKET_CATEGORY)
+    .setPlaceholder("Kategori seçerek biletinizi oluşturun...")
+    .addOptions(
+      CATEGORIES.map((c) => ({
+        label: c.label,
+        value: c.value,
+        description: c.description,
+        emoji: c.emoji,
+      })),
+    );
+
+  const selectRow =
+    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+
+  const resetRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId(BUTTON_IDS.OPEN_TICKET)
-      .setLabel("📩 Ticket Aç")
-      .setStyle(ButtonStyle.Primary),
+      .setCustomId(BUTTON_IDS.RESET_SELECT)
+      .setLabel("🔧 Seçenekleri Sıfırla")
+      .setStyle(ButtonStyle.Secondary),
   );
 
   await targetChannel.send({
     embeds: [panelEmbed],
-    components: [openRow],
+    components: [selectRow, resetRow],
   });
 
   await interaction.editReply({
