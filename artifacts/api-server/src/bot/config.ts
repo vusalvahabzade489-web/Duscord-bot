@@ -39,13 +39,13 @@ export const CATEGORIES = [
     label: "Oyun Dışı Destek",
     value: "oyun_disi",
     description: "Teknik Hatalar, Bug ve Şikayet İçin",
-    emoji: "🏷️",
+    emoji: "🎟️",
   },
   {
     label: "Bağış (Donate)",
     value: "bagis",
     description: "Sunucuya Destek Olmak, Reklam ve Ortaklık İçin",
-    emoji: "💗",
+    emoji: "💎",
   },
 ] as const;
 
