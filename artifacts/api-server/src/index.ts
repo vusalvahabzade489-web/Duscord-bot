@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { startBot } from "./bot/index";
 
 const rawPort = process.env["PORT"];
 
@@ -17,4 +18,8 @@ if (Number.isNaN(port) || port <= 0) {
 
 app.listen(port, () => {
   logger.info({ port }, "Server listening");
+});
+
+startBot().catch((err) => {
+  logger.error({ err }, "Failed to start Discord bot");
 });

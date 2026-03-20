@@ -4,6 +4,27 @@
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
 
+Includes a Discord Ticket Bot that runs alongside the Express API server.
+
+## Discord Ticket Bot
+
+The bot runs inside `artifacts/api-server` alongside Express.
+
+**Features:**
+- `/setup [#kanal]` — Admin komutu, seçilen kanala ticket paneli gönderir
+- "📩 Ticket Aç" butonu — Kullanıcıya özel private kanal açar
+- "🔒 Kapat" butonu — Kapatma onayı ister
+- Onay sonrası kanal 5 saniyede silinir
+- Sadece ticket sahibi ve adminler kanalı görebilir / kapatabilir
+
+**Files:**
+- `src/bot/index.ts` — Bot başlatma, event handler'lar
+- `src/bot/tickets.ts` — Ticket aç/kapat logic
+- `src/bot/commands.ts` — /setup slash komutu
+- `src/bot/config.ts` — Sabitler ve renkler
+
+**Required secret:** `DISCORD_TOKEN`
+
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
