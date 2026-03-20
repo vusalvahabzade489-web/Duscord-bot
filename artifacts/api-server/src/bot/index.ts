@@ -1,4 +1,5 @@
 import {
+  ActivityType,
   Client,
   Events,
   GatewayIntentBits,
@@ -36,6 +37,16 @@ export async function startBot(): Promise<void> {
 
   client.once(Events.ClientReady, async (c) => {
     logger.info({ tag: c.user.tag }, "Discord bot is ready");
+
+    c.user.setPresence({
+      status: "idle",
+      activities: [
+        {
+          name: "🛡️ Sunucuyu koruyor",
+          type: ActivityType.Watching,
+        },
+      ],
+    });
 
     const rest = new REST().setToken(token);
 
