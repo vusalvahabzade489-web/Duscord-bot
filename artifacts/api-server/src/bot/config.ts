@@ -34,14 +34,14 @@ export const CATEGORIES = [
     label: "Oyun İçi Destek",
     value: "oyun_ici",
     description: "Oyun İçinde Yaşanan Problemler İçin",
-    emoji: "🎮",
+    emoji: { id: "1476788791929995354" },
     displayEmoji: "🎮",
   },
   {
     label: "Oyun Dışı Destek",
     value: "oyun_disi",
     description: "Teknik Hatalar, Bug ve Şikayet İçin",
-    emoji: "🎟️",
+    emoji: { id: "1476788748401250458" },
     displayEmoji: "🎟️",
   },
   {
