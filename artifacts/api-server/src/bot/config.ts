@@ -1,6 +1,7 @@
 export const TICKET_CATEGORY_NAME = "TICKETS";
 export const SUPPORT_ROLE_NAME = "Support";
 export const SERVER_NAME = "Tr Aze RP";
+export const STAFF_ROLE_ID = "1465970726816448667";
 
 export const COLORS = {
   BLURPLE: 0x5865f2,
@@ -33,19 +34,22 @@ export const CATEGORIES = [
     label: "Oyun İçi Destek",
     value: "oyun_ici",
     description: "Oyun İçinde Yaşanan Problemler İçin",
-    emoji: "🎮",
+    emoji: { id: "1484763768398549022" } as string | { id: string },
+    displayEmoji: "🎮",
   },
   {
     label: "Oyun Dışı Destek",
     value: "oyun_disi",
     description: "Teknik Hatalar, Bug ve Şikayet İçin",
-    emoji: "🎟️",
+    emoji: { id: "1484763904029626459" } as string | { id: string },
+    displayEmoji: "🎟️",
   },
   {
     label: "Bağış (Donate)",
     value: "bagis",
     description: "Sunucuya Destek Olmak, Reklam ve Ortaklık İçin",
-    emoji: "💎",
+    emoji: "💎" as string | { id: string },
+    displayEmoji: "💎",
   },
 ] as const;
 

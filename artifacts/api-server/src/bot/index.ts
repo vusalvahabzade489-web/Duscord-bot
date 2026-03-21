@@ -95,31 +95,23 @@ export async function startBot(): Promise<void> {
       }
 
       if (interaction.isButton()) {
-        switch (interaction.customId) {
-          case BUTTON_IDS.CLAIM_TICKET:
-            await claimTicket(interaction);
-            break;
-          case BUTTON_IDS.CLOSE_TICKET:
-            await closeTicketPrompt(interaction);
-            break;
-          case BUTTON_IDS.RATING_1:
-            await handleRating(interaction, 1);
-            break;
-          case BUTTON_IDS.RATING_2:
-            await handleRating(interaction, 2);
-            break;
-          case BUTTON_IDS.RATING_3:
-            await handleRating(interaction, 3);
-            break;
-          case BUTTON_IDS.RATING_4:
-            await handleRating(interaction, 4);
-            break;
-          case BUTTON_IDS.RATING_5:
-            await handleRating(interaction, 5);
-            break;
-          case BUTTON_IDS.RESET_SELECT:
-            await resetSelect(interaction);
-            break;
+        const id = interaction.customId;
+        if (id === BUTTON_IDS.CLAIM_TICKET) {
+          await claimTicket(interaction);
+        } else if (id.startsWith(BUTTON_IDS.CLOSE_TICKET)) {
+          await closeTicketPrompt(interaction);
+        } else if (id.startsWith(BUTTON_IDS.RATING_1)) {
+          await handleRating(interaction, 1);
+        } else if (id.startsWith(BUTTON_IDS.RATING_2)) {
+          await handleRating(interaction, 2);
+        } else if (id.startsWith(BUTTON_IDS.RATING_3)) {
+          await handleRating(interaction, 3);
+        } else if (id.startsWith(BUTTON_IDS.RATING_4)) {
+          await handleRating(interaction, 4);
+        } else if (id.startsWith(BUTTON_IDS.RATING_5)) {
+          await handleRating(interaction, 5);
+        } else if (id === BUTTON_IDS.RESET_SELECT) {
+          await resetSelect(interaction);
         }
       }
     } catch (err) {

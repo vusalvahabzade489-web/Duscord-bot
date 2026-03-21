@@ -47,7 +47,7 @@ export async function handleSetup(
     .setDescription(
       "**Bir sorun mu yaşıyorsunuz?**\n\n" +
         "Aşağıdaki menüden size en uygun kategoriyi seçerek bizimle iletişime geçebilirsiniz.\n\n" +
-        CATEGORIES.map((c) => `${c.emoji} **${c.label}:** ${c.description}`).join("\n"),
+        CATEGORIES.map((c) => `${c.displayEmoji} **${c.label}:** ${c.description}`).join("\n"),
     )
     .setThumbnail(interaction.guild?.iconURL() ?? null)
     .setFooter({

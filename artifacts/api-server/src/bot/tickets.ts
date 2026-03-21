@@ -20,9 +20,12 @@ import {
   CategoryValue,
   COLORS,
   SERVER_NAME,
+  STAFF_ROLE_ID,
   TICKET_CATEGORY_NAME,
 } from "./config.js";
 import { logger } from "../lib/logger.js";
+
+const LOG_KANAL_ID = "1465752031292821599";
 
 async function getOrCreateCategory(guild: Guild): Promise<CategoryChannel> {
   const existing = guild.channels.cache.find(
@@ -41,7 +44,8 @@ async function getOrCreateCategory(guild: Guild): Promise<CategoryChannel> {
 
 function getCategoryLabel(value: CategoryValue): string {
   const cat = CATEGORIES.find((c) => c.value === value);
-  return cat ? `${cat.emoji} ${cat.label}` : value;
+  if (!cat) return value;
+  return `${cat.displayEmoji} ${cat.label}`;
 }
 
 function getAccountAge(createdAt: Date): string {
@@ -56,7 +60,7 @@ function getAccountAge(createdAt: Date): string {
   return `${diffDays} gün önce`;
 }
 
-function buildTicketButtons(claimedBy?: string): ActionRowBuilder<ButtonBuilder> {
+function buildTicketButtons(claimedBy?: string, claimedById?: string): ActionRowBuilder<ButtonBuilder> {
   const claimButton = new ButtonBuilder()
     .setCustomId(BUTTON_IDS.CLAIM_TICKET)
     .setStyle(claimedBy ? ButtonStyle.Success : ButtonStyle.Primary)
@@ -64,7 +68,7 @@ function buildTicketButtons(claimedBy?: string): ActionRowBuilder<ButtonBuilder>
     .setDisabled(!!claimedBy);
 
   const closeButton = new ButtonBuilder()
-    .setCustomId(BUTTON_IDS.CLOSE_TICKET)
+    .setCustomId(claimedById ? `${BUTTON_IDS.CLOSE_TICKET}_${claimedById}` : BUTTON_IDS.CLOSE_TICKET)
     .setLabel("🔴 Kapat")
     .setStyle(ButtonStyle.Danger);
 
@@ -136,17 +140,16 @@ export async function openTicket(
           PermissionFlagsBits.ReadMessageHistory,
         ],
       },
+      {
+        id: STAFF_ROLE_ID,
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.ReadMessageHistory,
+        ],
+      },
     ],
   });
-
-  const supportRole = guild.roles.cache.find((r) => r.name === "Support");
-  if (supportRole) {
-    await ticketChannel.permissionOverwrites.create(supportRole, {
-      ViewChannel: true,
-      SendMessages: true,
-      ReadMessageHistory: true,
-    });
-  }
 
   const adminRoles = guild.roles.cache.filter(
     (r) => r.permissions.has(PermissionFlagsBits.Administrator) && !r.managed,
@@ -201,7 +204,7 @@ export async function openTicket(
   const actionRow = buildTicketButtons();
 
   await ticketChannel.send({
-    content: `${member}${supportRole ? ` ${supportRole}` : ""}`,
+    content: `${member} <@&${STAFF_ROLE_ID}>`,
     embeds: [openEmbed],
     components: [actionRow],
   });
@@ -226,7 +229,7 @@ export async function claimTicket(interaction: Interaction): Promise<void> {
 
   const isAdmin = member.permissions.has(PermissionFlagsBits.Administrator);
   const hasSupport =
-    member.roles.cache.some((r) => r.name === "Support") || isAdmin;
+    member.roles.cache.some((r) => r.id === STAFF_ROLE_ID) || isAdmin;
 
   if (!hasSupport) {
     await interaction.reply({
@@ -236,7 +239,7 @@ export async function claimTicket(interaction: Interaction): Promise<void> {
     return;
   }
 
-  const updatedRow = buildTicketButtons(member.user.username);
+  const updatedRow = buildTicketButtons(member.user.username, member.id);
 
   await interaction.update({ components: [updatedRow] });
 
@@ -263,8 +266,10 @@ export async function closeTicketPrompt(
   if (!interaction.isButton()) return;
 
   const member = interaction.member as GuildMember;
-
   if (!member) return;
+
+  const parts = interaction.customId.split("_");
+  const staffId = parts.length > 2 ? parts.slice(2).join("_") : "Bilinmiyor";
 
   await interaction.reply({
     embeds: [
@@ -279,26 +284,26 @@ export async function closeTicketPrompt(
     components: [
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId(BUTTON_IDS.RATING_1)
-          .setLabel("💛 1 Yıldız")
+          .setCustomId(`${BUTTON_IDS.RATING_1}_${staffId}`)
+          .setLabel("⭐ 1 Yıldız")
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(BUTTON_IDS.RATING_2)
-          .setLabel("💛 2 Yıldız")
+          .setCustomId(`${BUTTON_IDS.RATING_2}_${staffId}`)
+          .setLabel("⭐ 2 Yıldız")
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(BUTTON_IDS.RATING_3)
-          .setLabel("💛 3 Yıldız")
+          .setCustomId(`${BUTTON_IDS.RATING_3}_${staffId}`)
+          .setLabel("⭐ 3 Yıldız")
           .setStyle(ButtonStyle.Primary),
       ),
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId(BUTTON_IDS.RATING_4)
-          .setLabel("💛 4 Yıldız")
+          .setCustomId(`${BUTTON_IDS.RATING_4}_${staffId}`)
+          .setLabel("⭐ 4 Yıldız")
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(BUTTON_IDS.RATING_5)
-          .setLabel("💛 5 Yıldız")
+          .setCustomId(`${BUTTON_IDS.RATING_5}_${staffId}`)
+          .setLabel("⭐ 5 Yıldız")
           .setStyle(ButtonStyle.Primary),
       ),
     ],
@@ -313,10 +318,31 @@ export async function handleRating(
 
   const member = interaction.member as GuildMember;
   const channel = interaction.channel as TextChannel;
+  const guild = interaction.guild;
 
-  if (!member || !channel) return;
+  if (!member || !channel || !guild) return;
+
+  const parts = interaction.customId.split("_");
+  const staffId = parts.length > 2 ? parts.slice(2).join("_") : "Bilinmiyor";
+  const staffMember = staffId !== "Bilinmiyor" ? await guild.members.fetch(staffId).catch(() => null) : null;
 
   const starDisplay = "⭐".repeat(stars) + "✩".repeat(5 - stars);
+
+  const logChannel = guild.channels.cache.get(LOG_KANAL_ID) as TextChannel | undefined;
+  if (logChannel) {
+    const logEmbed = new EmbedBuilder()
+      .setColor(COLORS.BLURPLE)
+      .setTitle("📊 Yeni Puanlama")
+      .addFields(
+        { name: "👤 Puanlayan", value: `${member} (${member.user.tag})`, inline: true },
+        { name: "👮 Puan Alan", value: staffMember ? `${staffMember} (${staffMember.user.tag})` : "Belirlenemedi", inline: true },
+        { name: "⭐ Puan", value: `${starDisplay} (${stars}/5)`, inline: false },
+      )
+      .setTimestamp()
+      .setFooter({ text: `${SERVER_NAME} | Puanlama Sistemi` });
+
+    await logChannel.send({ embeds: [logEmbed] });
+  }
 
   const ratedEmbed = new EmbedBuilder()
     .setColor(COLORS.RED)
