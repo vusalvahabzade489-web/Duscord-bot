@@ -18,8 +18,31 @@ if (Number.isNaN(port) || port <= 0) {
 
 app.listen(port, () => {
   logger.info({ port }, "Server listening");
+  startSelfPing(port);
 });
 
 startBot().catch((err) => {
   logger.error({ err }, "Failed to start Discord bot");
 });
+
+function startSelfPing(serverPort: number): void {
+  const devDomain = process.env["REPLIT_DEV_DOMAIN"];
+  const pingUrl = devDomain
+    ? `https://${devDomain}/api/healthz`
+    : `http://localhost:${serverPort}/api/healthz`;
+
+  const PING_INTERVAL_MS = 4 * 60 * 1000;
+
+  setInterval(async () => {
+    try {
+      const res = await fetch(pingUrl);
+      if (!res.ok) {
+        logger.warn({ status: res.status }, "Self-ping returned non-OK status");
+      }
+    } catch (err) {
+      logger.warn({ err }, "Self-ping failed");
+    }
+  }, PING_INTERVAL_MS);
+
+  logger.info({ pingUrl, intervalMinutes: 4 }, "Self-ping started");
+}
