@@ -69,8 +69,11 @@ function buildTicketButtons(claimedBy?: string, claimedById?: string): ActionRow
 
   const closeButton = new ButtonBuilder()
     .setCustomId(claimedById ? `${BUTTON_IDS.CLOSE_TICKET}_${claimedById}` : BUTTON_IDS.CLOSE_TICKET)
-    .setLabel("🔴 Kapat")
-    .setStyle(ButtonStyle.Danger);
+    .setLabel("Kapat")
+    .setStyle(ButtonStyle.Danger)
+    .setEmoji({
+      id: "1484836777067020428"
+    });
 
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     claimButton,
