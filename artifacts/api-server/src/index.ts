@@ -16,7 +16,8 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, () => {
+// 🔥 BURASI DÜZELTİLDİ
+app.listen(port, "0.0.0.0", () => {
   logger.info({ port }, "Server listening");
   startSelfPing(port);
 });
